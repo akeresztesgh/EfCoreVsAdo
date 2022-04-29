@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "efcorevsado": {
+      "commandName": "Project",
+      "commandLineArgs": "--run"
+    }
+  }
+}
