@@ -89,6 +89,7 @@ namespace database
             try
             {
                 con.Open();
+
                 return (long)await cmd.ExecuteScalarAsync();
             }
             finally
@@ -98,6 +99,42 @@ namespace database
 
         }
 
+        public async Task InsertManyEf(List<string> names)
+        {
+            var aLst = names.Select(x=> new A() { Name = x });
+            await dbContext.ARows.AddRangeAsync(aLst);
+            await dbContext.SaveChangesAsync();
+        }
 
+        public async Task InsertManyAdo(List<string> names)
+        {
+            var con = new SqlConnection(EfDbContext.ConnectionString);
+            var str = new StringBuilder("INSERT INTO AROWS VALUES");
+            var cmd = new SqlCommand();
+            cmd.Connection = con;
+
+            for (var i = 0; i < names.Count; i++)
+            {
+                str.Append($"(@name{i})");
+                if(i < names.Count - 1)
+                {
+                    str.Append(",");
+                }
+
+                cmd.Parameters.AddWithValue($"name{i}", names[i]);
+            }
+            cmd.CommandText = str.ToString();
+
+            try
+            {
+                con.Open();
+                await cmd.ExecuteNonQueryAsync();
+            }
+            finally
+            {
+                con.Close();
+            }
+
+        }
     }
 }
